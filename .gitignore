@@ -1,3 +1,3 @@
 /.env
 /web
-bin/*
+/bin/
