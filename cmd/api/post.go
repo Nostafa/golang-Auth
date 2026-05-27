@@ -10,8 +10,8 @@ import (
 )
 
 type createPostRequest struct {
-	Content string   `json:"content" validate:"required,max=50"`
-	Title   string   `json:"title" validate:"required,max=5"`
+	Content string   `json:"content" validate:"required,max=500"`
+	Title   string   `json:"title" validate:"required,max=50"`
 	Tags    []string `json:"tags"`
 }
 

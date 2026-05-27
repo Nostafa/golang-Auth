@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -34,4 +35,26 @@ func (u *UserStore) Create(ctx context.Context, user *User) error {
 		return err
 	}
 	return nil
+}
+
+func (u *UserStore) GetById(ctx context.Context, userId int64) (*User, error) {
+	query := `
+		SELECT id, first_name, last_name, username, email, password, created_at, updated_at
+		FROM users
+		WHERE id = $1
+		LIMIT 1
+	`
+	var user User
+	err := u.db.
+		QueryRowContext(ctx, query, userId).
+		Scan(&user.Id, &user.FirstName, &user.LastName, &user.Username, &user.Email, &user.Password, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, ErrNotFound
+		default:
+			return nil, err
+		}
+	}
+	return &user, nil
 }

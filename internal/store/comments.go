@@ -19,6 +19,19 @@ type CommentStore struct {
 	db *sql.DB
 }
 
+func (c *CommentStore) Create(ctx context.Context, comment *Comment) error {
+	query := `
+		INSERT INTO comments (user_id, post_id, content)
+		VALUES ($1, $2, $3)
+		RETURNING id, created_at
+	`
+	err := c.db.QueryRowContext(ctx, query, comment.UserId, comment.PostId, comment.Content).Scan(&comment.Id, &comment.CreatedAt)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *CommentStore) GetByPostId(ctx context.Context, postId int64) ([]Comment, error) {
 	query := `
 		SELECT
@@ -30,7 +43,8 @@ func (c *CommentStore) GetByPostId(ctx context.Context, postId int64) ([]Comment
 			u.id,
 			u.first_name,
 			u.last_name,
-			u.username
+			u.username,
+			u.email
 		FROM comments c
 		INNER JOIN users u ON u.id = c.user_id
 		WHERE c.post_id = $1
@@ -56,6 +70,7 @@ func (c *CommentStore) GetByPostId(ctx context.Context, postId int64) ([]Comment
 			&comment.User.FirstName,
 			&comment.User.LastName,
 			&comment.User.Username,
+			&comment.User.Email,
 		)
 
 		if err != nil {

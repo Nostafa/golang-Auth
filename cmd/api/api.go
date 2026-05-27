@@ -51,12 +51,19 @@ func (app *application) mount() http.Handler {
 
 		r.Route("/{postId}", func(r chi.Router) {
 			r.Get("/", app.getPostByIdHandler)
+			// r.Patch("/", app.updatePostHandler)
+			// r.Delete("/", app.deletePostHandler)
 		})
+	})
+
+	r.Route("/comments", func(r chi.Router) {
+		r.Post("/", app.createCommentHandler)
+		r.Get("/{postId}", app.getCommentsByPostIdHandler)
 	})
 
 	r.Route("/users", func(r chi.Router) {
 		r.Post("/", app.createUserHandler)
-
+		r.Get("/{userId}", app.getUserByIdHandler)
 	})
 
 	return r
