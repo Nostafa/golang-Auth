@@ -47,7 +47,7 @@ func (app *application) createPostHandler(w http.ResponseWriter, r *http.Request
 		UserId:  int64(userId),
 	}
 
-	err := app.store.Post.Create(ctx, &post)
+	_, err := app.store.Post.Create(ctx, &post)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return

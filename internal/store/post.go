@@ -24,19 +24,19 @@ type PostStore struct {
 	db *sql.DB
 }
 
-func (p *PostStore) Create(ctx context.Context, post *Post) error {
+func (p *PostStore) Create(ctx context.Context, post *Post) (*Post, error) {
 	query := `
 		INSERT INTO posts (content, title, tags, user_id)
 		VALUES ($1, $2, $3, $4)
-		RETURNING id, created_at, updated_at
+		RETURNING id, content, title, tags, user_id, created_at, updated_at
 	`
 	err := p.db.
 		QueryRowContext(ctx, query, post.Content, post.Title, pq.Array(post.Tags), post.UserId).
-		Scan(&post.Id, &post.CreatedAt, &post.UpdatedAt)
+		Scan(&post.Id, &post.Content, &post.Title, pq.Array(&post.Tags), &post.UserId, &post.CreatedAt, &post.UpdatedAt)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return post, nil
 }
 
 func (p *PostStore) GetById(ctx context.Context, postId int64) (*Post, error) {

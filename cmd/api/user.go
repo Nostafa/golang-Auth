@@ -28,11 +28,11 @@ func (app *application) createUserHandler(w http.ResponseWriter, r *http.Request
 		LastName:  input.LastName,
 		Username:  input.Username,
 		Email:     input.Email,
-		Password:  []byte(input.Password),
+		Password:  input.Password,
 	}
 	ctx := r.Context()
 
-	err := app.store.User.Create(ctx, user)
+	_, err := app.store.User.Create(ctx, user)
 	if err != nil {
 		app.internalServerError(w, r, err)
 		return
